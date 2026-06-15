@@ -41,11 +41,11 @@ const clienteController = {
                 nome,
                 cpf
             });
-            
+
 
             const telefone = Telefone.criar({
                 numero: numeroTelefone,
-                
+
             });
 
             const endereco = Enderecos.criar({
@@ -54,9 +54,9 @@ const clienteController = {
                 numero: numeroCasa,
                 bairro: enderecoViaCep.bairro,
                 cidade: enderecoViaCep.localidade,
-                estado: enderecoViaCep.estado, 
+                estado: enderecoViaCep.estado,
                 complemento: enderecoViaCep.complemento || null
-                
+
             });
 
             // DEBUG 
@@ -83,96 +83,96 @@ const clienteController = {
     },
 
     atualizar: async (req, res) => {
-    try {
-        const id = Number(req.query.id);
+        try {
+            const id = Number(req.query.id);
 
-        let {
-            nome,
-            cpf,
-            numeroTelefone,
-            numeroCasa,
-            cep
-        } = req.body;
+            let {
+                nome,
+                cpf,
+                numeroTelefone,
+                numeroCasa,
+                cep
+            } = req.body;
 
-        // Cliente obrigatório
-        if (!id || !nome || !cpf) {
-            return res.status(400).json({
-                message: "ID, nome e CPF são obrigatórios"
-            });
-        }
-
-        // Limpeza
-        cpf = limparNumero(cpf);
-
-        if (numeroTelefone) {
-            numeroTelefone = limparNumero(numeroTelefone);
-        }
-
-        if (cep) {
-            cep = limparNumero(cep);
-        }
-
-        // Validar CPF
-        if (!validarCPF(cpf)) {
-            return res.status(400).json({
-                message: "CPF inválido"
-            });
-        }
-
-        // Cliente obrigatório
-        const cliente = Cliente.editar({
-            nome,
-            cpf
-        }, id);
-
-        // Telefone opcional
-        const telefone = numeroTelefone
-            ? Telefone.editar({
-                numero: numeroTelefone
-            }, id)
-            : null;
-
-        let endereco = null;
-
-        // Endereço  usando ViaCEP
-        if (cep && numeroCasa) {
-            const enderecoViaCep = await respostaViaCep(cep);
-
-            if (!enderecoViaCep || enderecoViaCep.erro) {
+            // Cliente obrigatório
+            if (!id || !nome || !cpf) {
                 return res.status(400).json({
-                    message: "CEP inválido"
+                    message: "ID, nome e CPF são obrigatórios"
                 });
             }
 
-            endereco = Enderecos.editar({
-                cep,
-                logradouro: enderecoViaCep.logradouro,
-                numero: numeroCasa,
-                bairro: enderecoViaCep.bairro,
-                cidade: enderecoViaCep.localidade,
-                estado: enderecoViaCep.estado,
-                complemento: enderecoViaCep.complemento || null
+            // Limpeza
+            cpf = limparNumero(cpf);
+
+            if (numeroTelefone) {
+                numeroTelefone = limparNumero(numeroTelefone);
+            }
+
+            if (cep) {
+                cep = limparNumero(cep);
+            }
+
+            // Validar CPF
+            if (!validarCPF(cpf)) {
+                return res.status(400).json({
+                    message: "CPF inválido"
+                });
+            }
+
+            // Cliente obrigatório
+            const cliente = Cliente.editar({
+                nome,
+                cpf
             }, id);
+
+            // Telefone opcional
+            const telefone = numeroTelefone
+                ? Telefone.editar({
+                    numero: numeroTelefone
+                }, id)
+                : null;
+
+            let endereco = null;
+
+            // Endereço  usando ViaCEP
+            if (cep && numeroCasa) {
+                const enderecoViaCep = await respostaViaCep(cep);
+
+                if (!enderecoViaCep || enderecoViaCep.erro) {
+                    return res.status(400).json({
+                        message: "CEP inválido"
+                    });
+                }
+
+                endereco = Enderecos.editar({
+                    cep,
+                    logradouro: enderecoViaCep.logradouro,
+                    numero: numeroCasa,
+                    bairro: enderecoViaCep.bairro,
+                    cidade: enderecoViaCep.localidade,
+                    estado: enderecoViaCep.estado,
+                    complemento: enderecoViaCep.complemento || null
+                }, id);
+            }
+
+            const result = await clienteRepository.atualizar(
+                id,
+                cliente,
+                telefone,
+                endereco
+            );
+
+            return res.status(200).json({ result });
+
+        } catch (error) {
+            console.error(error);
+
+            return res.status(500).json({
+                message: "Ocorreu um erro no servidor",
+                errorMessage: error.message
+            });
         }
-
-        const result = await clienteRepository.atualizar(
-            id,
-            cliente,
-            telefone,
-            endereco
-        );
-
-        return res.status(200).json({ result });
-
-    } catch (error) {
-        console.error(error);
-
-        return res.status(500).json({
-            message: "Ocorreu um erro no servidor",
-            errorMessage: error.message
-        });
-    }
-},
+    },
 
     deletar: async (req, res) => {
         try {
@@ -201,9 +201,10 @@ const clienteController = {
         try {
             const id = req.params.id;
 
-            if(id){
-                const result = await clienteRepository.selecionarPorId(id);}
-                
+            if (id) {
+                const result = await clienteRepository.selecionarPorId(id);
+            }
+
             const result = await clienteRepository.selecionar();
 
             return res.status(200).json({ result });
@@ -215,7 +216,27 @@ const clienteController = {
                 errorMessage: error.message
             });
         }
+    },
+
+    selecionarPorId: async (req, res) => {
+        try {
+            const id = req.params.id;
+
+            const result = await clienteRepository.selecionarPorId(id);
+
+            return res.status(200).json({ result });
+
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({
+                message: "Ocorreu um erro no servidor",
+                errorMessage: error.message
+            }
+            );
+        }
     }
+
+
 };
 
 export default clienteController;
