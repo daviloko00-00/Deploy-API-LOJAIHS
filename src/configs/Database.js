@@ -87,7 +87,7 @@ export async function initializeDatabase() {
                 AUTO_INCREMENT = 28
                 DEFAULT CHARACTER SET = utf8mb4
                 COLLATE = utf8mb4_0900_ai_ci;`)
-            //endereços
+        //endereços
         await tempConnection.query(`
             CREATE TABLE IF NOT EXISTS enderecos (
                 Id INT NOT NULL AUTO_INCREMENT,
@@ -112,7 +112,7 @@ export async function initializeDatabase() {
                 DEFAULT CHARACTER SET = utf8mb4
                 COLLATE = utf8mb4_0900_ai_ci;`)
 
-            //produtos
+        //produtos
         await tempConnection.query(`
             CREATE TABLE IF NOT EXISTS loja_ihs.produtos (
                 Id INT NOT NULL AUTO_INCREMENT,
@@ -130,64 +130,64 @@ export async function initializeDatabase() {
                     ON UPDATE CASCADE)
         `);
 
-        //itemPedidos
-        await tempConnection.query(`
-            CREATE TABLE IF NOT EXISTS itempedidos (
-                Id INT NOT NULL AUTO_INCREMENT,
-                PedidoId INT NOT NULL,
-                ProdutoId INT NOT NULL,
-                Quantidade DECIMAL(18,2) NOT NULL,
-                ValorItem DECIMAL(18,2) NOT NULL,
-                PRIMARY KEY (Id, PedidoId, ProdutoId),
-                INDEX fk_itens_pedido_pedidos (PedidoId ASC) VISIBLE,
-                INDEX FK_itensPedidos_produtos (ProdutoId ASC) VISIBLE,
-                CONSTRAINT fk_itens_pedido_pedidos
-                    FOREIGN KEY (PedidoId)
-                    REFERENCES loja_ihs.pedidos (Id),
-                CONSTRAINT FK_itensPedidos_produtos
-                    FOREIGN KEY (ProdutoId)
-                    REFERENCES loja_ihs.produtos (Id))
-            `)
 
-            //telefones
-            await tempConnection.query(`
-                CREATE TABLE IF NOT EXISTS telefones (
-                    Id INT NOT NULL AUTO_INCREMENT,
-                    IdCliente INT NOT NULL,
-                    Numero VARCHAR(15) NOT NULL,
-                    DataCad TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-                    PRIMARY KEY (Id),
-                    INDEX IdCliente (IdCliente ASC) VISIBLE,
-                    CONSTRAINT telefones_ibfk_1
-                        FOREIGN KEY (IdCliente)
-                        REFERENCES loja_ihs.clientes (Id)
-                        ON DELETE RESTRICT
-                        ON UPDATE CASCADE)
+        //telefones
+        await tempConnection.query(`
+            CREATE TABLE IF NOT EXISTS telefones (
+                Id INT NOT NULL AUTO_INCREMENT,
+                IdCliente INT NOT NULL,
+                Numero VARCHAR(15) NOT NULL,
+                DataCad TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (Id),
+                INDEX IdCliente (IdCliente ASC) VISIBLE,
+                CONSTRAINT telefones_ibfk_1
+                FOREIGN KEY (IdCliente)
+                REFERENCES loja_ihs.clientes (Id)
+                ON DELETE RESTRICT
+                ON UPDATE CASCADE)
                 
                 `)
-        
+
 
 
         //pedidos 
         await tempConnection.query(`
-            CREATE TABLE IF NOT EXISTS pedidos (
-                Id INT NOT NULL AUTO_INCREMENT,
-                ClienteId INT NOT NULL,
-                SubTotal DECIMAL(18,2) NOT NULL,
-                Status ENUM('Aberto', 'Finalizado', 'Pendente') NOT NULL,
-                DataCad TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-                PRIMARY KEY (Id, ClienteId),
-                INDEX FK_clientes_pedidos (ClienteId ASC) VISIBLE,
-                CONSTRAINT FK_clientes_pedidos
-                    FOREIGN KEY (ClienteId)
-                    REFERENCES loja_ihs.clientes (Id))
-                ENGINE = InnoDB
-                DEFAULT CHARACTER SET = utf8mb4
-                COLLATE = utf8mb4_0900_ai_ci;
-`)
+                    CREATE TABLE IF NOT EXISTS pedidos (
+                        Id INT NOT NULL AUTO_INCREMENT,
+                        ClienteId INT NOT NULL,
+                        SubTotal DECIMAL(18,2) NOT NULL,
+                        Status ENUM('Aberto', 'Finalizado', 'Pendente') NOT NULL,
+                        DataCad TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+                        PRIMARY KEY (Id, ClienteId),
+                        INDEX FK_clientes_pedidos (ClienteId ASC) VISIBLE,
+                        CONSTRAINT FK_clientes_pedidos
+                        FOREIGN KEY (ClienteId)
+                        REFERENCES loja_ihs.clientes (Id))
+                        ENGINE = InnoDB
+                        DEFAULT CHARACTER SET = utf8mb4
+                        COLLATE = utf8mb4_0900_ai_ci;
+                        `)
 
 
 
+        //itemPedidos
+        await tempConnection.query(`
+                            CREATE TABLE IF NOT EXISTS itempedidos (
+                                Id INT NOT NULL AUTO_INCREMENT,
+                                PedidoId INT NOT NULL,
+                                ProdutoId INT NOT NULL,
+                                Quantidade DECIMAL(18,2) NOT NULL,
+                                ValorItem DECIMAL(18,2) NOT NULL,
+                                PRIMARY KEY (Id, PedidoId, ProdutoId),
+                                INDEX fk_itens_pedido_pedidos (PedidoId ASC) VISIBLE,
+                                INDEX FK_itensPedidos_produtos (ProdutoId ASC) VISIBLE,
+                                CONSTRAINT fk_itens_pedido_pedidos
+                                    FOREIGN KEY (PedidoId)
+                                    REFERENCES loja_ihs.pedidos (Id),
+                                CONSTRAINT FK_itensPedidos_produtos
+                                    FOREIGN KEY (ProdutoId)
+                                    REFERENCES loja_ihs.produtos (Id))
+                            `)
         await tempConnection.end();
         console.log("Banco de dados e tabelas verificados/criados com sucesso.");
     } catch (error) {
