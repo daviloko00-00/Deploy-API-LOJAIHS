@@ -50,7 +50,7 @@ export async function initializeDatabase() {
             ssl: { rejectUnauthorized: false }
         });
 
-        const dbName = process.env.DB_DATABASE || 'deploy';
+        const dbName = process.env.DB_DATABASE || 'loja_ihs';
 
         await tempConnection.query(
             `CREATE DATABASE IF NOT EXISTS \`${dbName}\`;`
