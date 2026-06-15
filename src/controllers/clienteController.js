@@ -199,6 +199,11 @@ const clienteController = {
 
     selecionar: async (req, res) => {
         try {
+            const id = req.params.id;
+
+            if(id){
+                const result = await clienteRepository.selecionarPorId(id);}
+                
             const result = await clienteRepository.selecionar();
 
             return res.status(200).json({ result });

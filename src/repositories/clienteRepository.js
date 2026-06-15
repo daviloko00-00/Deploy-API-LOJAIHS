@@ -66,7 +66,10 @@ const clienteRepository = {
     selecionarPorId: async (id) => {
         const sql = "SELECT * FROM clientes WHERE IdCliente = ?";
         const [rows] = await connection.execute(sql, [id]);
-        return rows[0];
+
+        const sqlEnd = "SELECT * FROM enderecos WHERE IdCliente=?";
+        const [rowsEnd] = await connection.execute(sqlEnd, [id])
+        return(rows[0], rowsEnd[0]);
     },
 
     atualizar: async (id, cliente, telefone, endereco) => {
